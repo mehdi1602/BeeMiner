@@ -1,7 +1,7 @@
 
 package ir.ac.modares.beeminer.model;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  *
@@ -12,7 +12,7 @@ public class Attribute {
     public String attributeName;
     public String attributeType;
     public int attributeTypeInt;
-    public Vector<String> categoricalValues;
+    public List<String> categoricalValues;
     public double atrMax;
     public double atrMin;
     public double atrGainRatio;
@@ -33,7 +33,7 @@ public class Attribute {
         } else if (attributeTypeInt > 0) {
             boolean flag = false;
             for (int i = 0; !flag && i < categoricalValues.size(); i++) {
-                if (atr.equals(categoricalValues.elementAt(i))) {
+                if (atr.equals(categoricalValues.get(i))) {
                     flag = true;
                     res = i + 1;
                 }

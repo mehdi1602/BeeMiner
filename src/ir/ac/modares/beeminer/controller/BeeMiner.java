@@ -9,9 +9,10 @@ package ir.ac.modares.beeminer.controller;
 import ir.ac.modares.beeminer.model.Rule;
 import ir.ac.modares.beeminer.model.Attribute;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 import weka.core.Instances;
 import weka.core.converters.AbstractFileLoader;
 
@@ -100,11 +101,11 @@ public final class BeeMiner {
     public int classIndex = 60;// the index of class attribute in dataset
     public int[] classInstancesCounter = new int[classCounter];//number of records corresponding to each class
     public boolean[] prunedIndex = new boolean[dataSetSize];//index of pruned instances
-    public Vector<Rule> inductedRules = new Vector<>(classCounter);
-    public Vector<Rule> rulePool = new Vector<>();
+    public List<Rule> inductedRules = new ArrayList<>(classCounter);
+    public List<Rule> rulePool = new ArrayList<>();
     private int testPoint = 0;
     public int[][] confMatrix;
-    public Vector<String> classNames;
+    public List<String> classNames;
     public int improveFactor = 10;
     public int MissionClass = 0;
     //</editor-fold>
@@ -164,7 +165,7 @@ public final class BeeMiner {
     }
 
     public BeeMiner(AbstractFileLoader loader) {
-        classNames = new Vector<>(4);
+        classNames = new ArrayList<>(4);
         LoadFromFile2(loader);
         findMaxMin(dataSet, -1);
         Normalize(dataSet);
@@ -187,14 +188,14 @@ public final class BeeMiner {
         classifiedTest = new boolean[dataSetSize / 10 + 1];
         confMatrix = new int[classCounter][classCounter];
         prunedIndex = new boolean[dataSetSize];
-        inductedRules = new Vector<>(classCounter);
+        inductedRules = new ArrayList<>(classCounter);
         rep = new int[D + 1];
 
     }
 
     public void initialization() {
         prunedIndex = new boolean[dataSetSize];
-        inductedRules.removeAllElements();
+        inductedRules.clear();
         setTestIndexes();
     }
 
@@ -307,7 +308,7 @@ public final class BeeMiner {
             addLastRule();
             RuleForClassifyCounter += inductedRules.size();
             for (int r = 0; r < inductedRules.size(); r++) {
-                TermsForRulesCounter += ruleLength(inductedRules.elementAt(r));
+                TermsForRulesCounter += ruleLength(inductedRules.get(r));
 
             }
             double mean1 = Test();
@@ -377,7 +378,7 @@ public final class BeeMiner {
             Attributes[i].attributeTypeInt = Instances.attribute(i).type();
             if (Attributes[i].attributeTypeInt > 0) {
                 Enumeration<String> val = Instances.attribute(i).enumerateValues();
-                Attributes[i].categoricalValues = new Vector<>();
+                Attributes[i].categoricalValues = new ArrayList<>();
                 for (; val.hasMoreElements();) {
                     Attributes[i].categoricalValues.add(val.nextElement());
                 }
@@ -902,7 +903,7 @@ public final class BeeMiner {
 
         for (int i = 0; i < classCounter; i++) {
             if (print) {
-                System.out.println("class: " + classNames.elementAt(i) + " = " + classInstancesCounter[i]);
+                System.out.println("class: " + classNames.get(i) + " = " + classInstancesCounter[i]);
             }
         }
     }
@@ -1288,31 +1289,31 @@ public final class BeeMiner {
         }
     }
 
-    public void YDM(Vector<Double> vec, Vector<double[]> rules, Vector<Integer> classes) {
+    public void YDM(List<Double> vec, List<double[]> rules, List<Integer> classes) {
         for (int i = 0; i < vec.size(); i++) {
 
             int idx = 0;
             int exClass = (i % classCounter) + 1;
             double max = -1;
             for (int k = i; k < vec.size(); k++) {
-                if (classes.elementAt(k) == exClass) {
-                    if (vec.elementAt(k) > max) {
+                if (classes.get(k) == exClass) {
+                    if (vec.get(k) > max) {
                         idx = k;
-                        max = vec.elementAt(k);
+                        max = vec.get(k);
                     }
                 }
             }
 
             if (idx != i) {
-                double tmp = vec.elementAt(i);
-                double[] rtmp = rules.elementAt(i);
-                int ctmp = classes.elementAt(i);
+                double tmp = vec.get(i);
+                double[] rtmp = rules.get(i);
+                int ctmp = classes.get(i);
                 vec.remove(i);
                 rules.remove(i);
                 classes.remove(i);
-                vec.add(i, vec.elementAt(idx - 1));
-                rules.add(i, rules.elementAt(idx - 1));
-                classes.add(i, classes.elementAt(idx - 1));
+                vec.add(i, vec.get(idx - 1));
+                rules.add(i, rules.get(idx - 1));
+                classes.add(i, classes.get(idx - 1));
                 vec.remove(idx);
                 rules.remove(idx);
                 classes.remove(idx);
@@ -1322,27 +1323,27 @@ public final class BeeMiner {
             }
 
             if (print) {
-                System.out.println("class:" + i + " " + classNames.elementAt(classes.elementAt(i) - 1));
+                System.out.println("class:" + i + " " + classNames.get(classes.get(i) - 1));
             }
             if (print) {
-                System.out.println("accu:" + i + " " + vec.elementAt(i));
+                System.out.println("accu:" + i + " " + vec.get(i));
             }
         }
     }
 
-    public void Sort(Vector<Double> vec, Vector<double[]> rules, Vector<Integer> classes) {
+    public void Sort(List<Double> vec, List<double[]> rules, List<Integer> classes) {
         for (int i = 0; i < vec.size(); i++) {
             for (int j = i + 1; j < vec.size(); j++) {
-                if (vec.elementAt(j) > vec.elementAt(i)) {
-                    double tmp = vec.elementAt(i);
-                    double[] rtmp = rules.elementAt(i);
-                    int ctmp = classes.elementAt(i);
+                if (vec.get(j) > vec.get(i)) {
+                    double tmp = vec.get(i);
+                    double[] rtmp = rules.get(i);
+                    int ctmp = classes.get(i);
                     vec.remove(i);
                     rules.remove(i);
                     classes.remove(i);
-                    vec.add(i, vec.elementAt(j - 1));
-                    rules.add(i, rules.elementAt(j - 1));
-                    classes.add(i, classes.elementAt(j - 1));
+                    vec.add(i, vec.get(j - 1));
+                    rules.add(i, rules.get(j - 1));
+                    classes.add(i, classes.get(j - 1));
                     vec.remove(j);
                     rules.remove(j);
                     classes.remove(j);
@@ -1352,7 +1353,7 @@ public final class BeeMiner {
                 }
             }
             if (print) {
-                System.out.println("class:" + i + " " + classNames.elementAt(classes.elementAt(i) - 1));
+                System.out.println("class:" + i + " " + classNames.get(classes.get(i) - 1));
             }
         }
     }
@@ -1370,9 +1371,9 @@ public final class BeeMiner {
                 if (classifiedTest[i]) {
                     continue;
                 }
-                if (isInRuleDomain(inductedRules.elementAt(r), dataSet[testIndex[i]], missing[testIndex[i]])) {
+                if (isInRuleDomain(inductedRules.get(r), dataSet[testIndex[i]], missing[testIndex[i]])) {
                     testCounter++;
-                    int PC = inductedRules.elementAt(r).foodClass;
+                    int PC = inductedRules.get(r).foodClass;
                     int RC = (int) dataSet[testIndex[i]][classIndex];
                     if (PC == RC) {
                         corrCounter++;
@@ -1399,9 +1400,9 @@ public final class BeeMiner {
                 if (isInArray(testIndex, i) || classifiedTRA[i]) {
                     continue;
                 }
-                if (isInRuleDomain(inductedRules.elementAt(r), dataSet[i], missing[i])) {
+                if (isInRuleDomain(inductedRules.get(r), dataSet[i], missing[i])) {
                     testCounter++;
-                    int PC = inductedRules.elementAt(r).foodClass;
+                    int PC = inductedRules.get(r).foodClass;
                     int RC = (int) dataSet[i][classIndex];
                     if (PC == RC) {
                         corrCounter++;
@@ -1614,17 +1615,17 @@ public final class BeeMiner {
                 }
                 switch (atrStatus[j]) {
                     case 0:
-                        res = res + ", " + Attributes[j + shift].attributeName + " = " + Attributes[j + shift].categoricalValues.elementAt(minCeil - 1);
+                        res = res + ", " + Attributes[j + shift].attributeName + " = " + Attributes[j + shift].categoricalValues.get(minCeil - 1);
                         break;
                     case 1:
-                        res = res + ", " + Attributes[j + shift].attributeName + " != " + Attributes[j + shift].categoricalValues.elementAt(minCeil - 1);
+                        res = res + ", " + Attributes[j + shift].attributeName + " != " + Attributes[j + shift].categoricalValues.get(minCeil - 1);
                         break;
 
                 }
             }
         }
 
-        res = res + " THEN Class " + classNames.elementAt(sol.foodClass - 1);
+        res = res + " THEN Class " + classNames.get(sol.foodClass - 1);
         return res;
     }
 
@@ -1789,7 +1790,7 @@ public final class BeeMiner {
             System.out.println("\n\ncounter " + counter + " TP: " + con[0][0] + " FP: "
                     + con[1][0] + " testPoint: " + testPoint);
             System.out.println(ruleString(GlobalParams));
-            System.out.println("Rule Accuracy: " + inductedRules.elementAt(inductedRules.size() - 1).foodClass + " globalmin = " + GlobalMin + " FoodNumber: " + FoodNumber + "\n\n");
+            System.out.println("Rule Accuracy: " + inductedRules.get(inductedRules.size() - 1).foodClass + " globalmin = " + GlobalMin + " FoodNumber: " + FoodNumber + "\n\n");
 
         }
 //             atrGainBound = new double[D/3];
